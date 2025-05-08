@@ -1,0 +1,72 @@
+[07-May-2025 21:57:47 Europe/Berlin] Raw input: {"bank_id":5,"question_text":"Use the bishop to capture the queen?","correct_answer":"Bxg2","position":"{\"starting_fen\":\"k5r1/1p2p3/2bp4/4p3/P7/2PPP3/1R2P1Q1/K7 w - - 0 1\",\"solution_fen\":\"k5r1/1p2p3/3p4/4p3/P7/2PPP3/1R2P1b1/K7 w - - 0 1\",\"algebraic_notation\":\"Bxg2\",\"move_sequence\":[{\"from\":\"c6\",\"to\":\"g2\",\"san\":\"Bxg2\",\"piece\":\"b\",\"isCapture\":true,\"isCheck\":false,\"isCheckmate\":false}]}","question_id":8,"is_active":true}
+[07-May-2025 21:57:47 Europe/Berlin] Received update request: Array
+(
+    [bank_id] => 5
+    [question_text] => Use the bishop to capture the queen?
+    [correct_answer] => Bxg2
+    [position] => {"starting_fen":"k5r1/1p2p3/2bp4/4p3/P7/2PPP3/1R2P1Q1/K7 w - - 0 1","solution_fen":"k5r1/1p2p3/3p4/4p3/P7/2PPP3/1R2P1b1/K7 w - - 0 1","algebraic_notation":"Bxg2","move_sequence":[{"from":"c6","to":"g2","san":"Bxg2","piece":"b","isCapture":true,"isCheck":false,"isCheckmate":false}]}
+    [question_id] => 8
+    [is_active] => 1
+)
+
+[07-May-2025 21:57:47 Europe/Berlin] Updating question 8 with text: Use the bishop to capture the queen?, answer: Bxg2, order: 3
+[07-May-2025 21:57:47 Europe/Berlin] Algebraic notation: Bxg2, Move sequence: [{"from":"c6","to":"g2","san":"Bxg2","piece":"b","isCapture":true,"isCheck":false,"isCheckmate":false}]
+[07-May-2025 21:57:47 Europe/Berlin] Success response sent: {"success":true,"message":"Question updated successfully","question":{"id":8,"fen":"k5r1\/1p2p3\/2bp4\/4p3\/P7\/2PPP3\/1R2P1Q1\/K7 w - - 0 1","solutionFen":"k5r1\/1p2p3\/3p4\/4p3\/P7\/2PPP3\/1R2P1b1\/K7 w - - 0 1","order":3,"is_active":true,"algebraicNotation":"Bxg2","moveSequence":"[{\"from\":\"c6\",\"to\":\"g2\",\"san\":\"Bxg2\",\"piece\":\"b\",\"isCapture\":true,\"isCheck\":false,\"isCheckmate\":false}]"}}
+[07-May-2025 22:02:16 Europe/Berlin] Raw input: {"bank_id":5,"question_text":"Use the bishop to capture the queen?","correct_answer":"Bxg2","position":"{\"starting_fen\":\"k5r1/1p2p3/2bp4/4p3/P7/2PPP3/1R2P1Q1/K7 w - - 0 1\",\"solution_fen\":\"k5r1/1p2p3/3p4/4p3/P7/2PPP3/1R2P1b1/K7 w - - 0 1\",\"algebraic_notation\":\"Bxg2\",\"move_sequence\":[{\"from\":\"c6\",\"to\":\"g2\",\"san\":\"Bxg2\",\"piece\":\"b\",\"isCapture\":true,\"isCheck\":false,\"isCheckmate\":false}]}","question_order":3,"question_id":8,"is_active":true}
+[07-May-2025 22:02:16 Europe/Berlin] Received update request: Array
+(
+    [bank_id] => 5
+    [question_text] => Use the bishop to capture the queen?
+    [correct_answer] => Bxg2
+    [position] => {"starting_fen":"k5r1/1p2p3/2bp4/4p3/P7/2PPP3/1R2P1Q1/K7 w - - 0 1","solution_fen":"k5r1/1p2p3/3p4/4p3/P7/2PPP3/1R2P1b1/K7 w - - 0 1","algebraic_notation":"Bxg2","move_sequence":[{"from":"c6","to":"g2","san":"Bxg2","piece":"b","isCapture":true,"isCheck":false,"isCheckmate":false}]}
+    [question_order] => 3
+    [question_id] => 8
+    [is_active] => 1
+)
+
+[07-May-2025 22:02:16 Europe/Berlin] Updating question 8 with text: Use the bishop to capture the queen?, answer: Bxg2, order: 3
+[07-May-2025 22:02:16 Europe/Berlin] Algebraic notation: Bxg2, Move sequence: [{"from":"c6","to":"g2","san":"Bxg2","piece":"b","isCapture":true,"isCheck":false,"isCheckmate":false}]
+[07-May-2025 22:02:16 Europe/Berlin] Success response sent: {"success":true,"message":"Question updated successfully","question":{"id":8,"fen":"k5r1\/1p2p3\/2bp4\/4p3\/P7\/2PPP3\/1R2P1Q1\/K7 w - - 0 1","solutionFen":"k5r1\/1p2p3\/3p4\/4p3\/P7\/2PPP3\/1R2P1b1\/K7 w - - 0 1","order":3,"is_active":true,"algebraicNotation":"Bxg2","moveSequence":"[{\"from\":\"c6\",\"to\":\"g2\",\"san\":\"Bxg2\",\"piece\":\"b\",\"isCapture\":true,\"isCheck\":false,\"isCheckmate\":false}]"}}
+[07-May-2025 22:06:29 Europe/Berlin] Fetching questions for bank ID: 5
+[07-May-2025 22:06:29 Europe/Berlin] Raw position data for question 6: {"starting_fen":"rnbqkbnr\/pppppppp\/8\/8\/4P3\/8\/PPPP1PPP\/RNBQKBNR b KQkq e3 0 1","solution_fen":"rnbqkbnr\/pppp1ppp\/8\/4p3\/4P3\/8\/PPPP1PPP\/RNBQKBNR w KQkq e6 0 2"}
+[07-May-2025 22:06:29 Europe/Berlin] Raw position data for question 7: {"starting_fen":"rnbqkbnr\/pppp1ppp\/8\/4p3\/8\/5N2\/PPPPPPPP\/RNBQKB1R w KQkq - 0 1","solution_fen":"rnbqkbnr\/pppp1ppp\/8\/4N3\/8\/8\/PPPPPPPP\/RNBQKB1R b KQkq - 0 1"}
+[07-May-2025 22:06:29 Europe/Berlin] Raw position data for question 8: {"starting_fen":"k5r1/1p2p3/2bp4/4p3/P7/2PPP3/1R2P1Q1/K7 w - - 0 1","solution_fen":"k5r1/1p2p3/3p4/4p3/P7/2PPP3/1R2P1b1/K7 w - - 0 1","algebraic_notation":"Bxg2","move_sequence":[{"from":"c6","to":"g2","san":"Bxg2","piece":"b","isCapture":true,"isCheck":f
+[07-May-2025 22:06:29 Europe/Berlin] Error decoding position JSON for question 8: Syntax error
+[07-May-2025 22:06:29 Europe/Berlin] No starting_fen in position data for question 8
+[07-May-2025 22:06:30 Europe/Berlin] No solution_fen in position data for question 8
+[07-May-2025 22:06:30 Europe/Berlin] Returning 3 questions for bank 5
+[07-May-2025 22:19:19 Europe/Berlin] Fetching questions for bank ID: 5
+[07-May-2025 22:19:19 Europe/Berlin] Raw position data for question 6: {"starting_fen":"rnbqkbnr\/pppppppp\/8\/8\/4P3\/8\/PPPP1PPP\/RNBQKBNR b KQkq e3 0 1","solution_fen":"rnbqkbnr\/pppp1ppp\/8\/4p3\/4P3\/8\/PPPP1PPP\/RNBQKBNR w KQkq e6 0 2"}
+[07-May-2025 22:19:19 Europe/Berlin] Raw position data for question 7: {"starting_fen":"rnbqkbnr\/pppp1ppp\/8\/4p3\/8\/5N2\/PPPPPPPP\/RNBQKB1R w KQkq - 0 1","solution_fen":"rnbqkbnr\/pppp1ppp\/8\/4N3\/8\/8\/PPPPPPPP\/RNBQKB1R b KQkq - 0 1"}
+[07-May-2025 22:19:19 Europe/Berlin] Raw position data for question 8:  false,"isCheckmate":false}]}
+[07-May-2025 22:19:19 Europe/Berlin] Error decoding position JSON for question 8: Syntax error
+[07-May-2025 22:19:19 Europe/Berlin] No starting_fen in position data for question 8
+[07-May-2025 22:19:19 Europe/Berlin] No solution_fen in position data for question 8
+[07-May-2025 22:19:19 Europe/Berlin] Returning 3 questions for bank 5
+[07-May-2025 22:21:14 Europe/Berlin] Raw input: {"bank_id":5,"question_text":"Use the bishop to capture the queen?","correct_answer":"Bxd1","position":"{\"starting_fen\":\"2rqkbnr/pp2pppp/n7/7b/8/2N5/P1P2PPP/R1BQKBNR w KQkq - 0 1\",\"solution_fen\":\"2rqkbnr/pp2pppp/n7/8/8/2N5/P1P2PPP/R1BbKBNR w KQkq - 0 1\"}","question_order":3,"question_id":8,"is_active":true,"algebraic_notation":"Bxd1","move_sequence":"[{\"from\":\"h5\",\"to\":\"d1\",\"san\":\"Bxd1\",\"piece\":\"b\",\"isCapture\":true,\"isCheck\":false,\"isCheckmate\":false}]"}
+[07-May-2025 22:21:14 Europe/Berlin] Received update request: Array
+(
+    [bank_id] => 5
+    [question_text] => Use the bishop to capture the queen?
+    [correct_answer] => Bxd1
+    [position] => {"starting_fen":"2rqkbnr/pp2pppp/n7/7b/8/2N5/P1P2PPP/R1BQKBNR w KQkq - 0 1","solution_fen":"2rqkbnr/pp2pppp/n7/8/8/2N5/P1P2PPP/R1BbKBNR w KQkq - 0 1"}
+    [question_order] => 3
+    [question_id] => 8
+    [is_active] => 1
+    [algebraic_notation] => Bxd1
+    [move_sequence] => [{"from":"h5","to":"d1","san":"Bxd1","piece":"b","isCapture":true,"isCheck":false,"isCheckmate":false}]
+)
+
+[07-May-2025 22:21:14 Europe/Berlin] Updating question 8 with:
+[07-May-2025 22:21:14 Europe/Berlin] Starting FEN: 2rqkbnr/pp2pppp/n7/7b/8/2N5/P1P2PPP/R1BQKBNR w KQkq - 0 1
+[07-May-2025 22:21:14 Europe/Berlin] Solution FEN: 2rqkbnr/pp2pppp/n7/8/8/2N5/P1P2PPP/R1BbKBNR w KQkq - 0 1
+[07-May-2025 22:21:14 Europe/Berlin] Algebraic notation: Bxd1
+[07-May-2025 22:21:14 Europe/Berlin] Move sequence: [{"from":"h5","to":"d1","san":"Bxd1","piece":"b","isCapture":true,"isCheck":false,"isCheckmate":false}]
+[07-May-2025 22:21:14 Europe/Berlin] Updating question 8 with text: Use the bishop to capture the queen?, answer: Bxd1, order: 3
+[07-May-2025 22:21:14 Europe/Berlin] Algebraic notation: Bxd1, Move sequence: [{"from":"h5","to":"d1","san":"Bxd1","piece":"b","isCapture":true,"isCheck":false,"isCheckmate":false}]
+[07-May-2025 22:21:14 Europe/Berlin] Success response sent: {"success":true,"message":"Question updated successfully","question":{"id":8,"fen":"2rqkbnr\/pp2pppp\/n7\/7b\/8\/2N5\/P1P2PPP\/R1BQKBNR w KQkq - 0 1","solutionFen":"2rqkbnr\/pp2pppp\/n7\/8\/8\/2N5\/P1P2PPP\/R1BbKBNR w KQkq - 0 1","order":3,"is_active":true,"algebraicNotation":"Bxd1","moveSequence":"[{\"from\":\"h5\",\"to\":\"d1\",\"san\":\"Bxd1\",\"piece\":\"b\",\"isCapture\":true,\"isCheck\":false,\"isCheckmate\":false}]"}}
+[07-May-2025 22:21:14 Europe/Berlin] Fetching questions for bank ID: 5
+[07-May-2025 22:21:14 Europe/Berlin] Raw position data for question 6: {"starting_fen":"rnbqkbnr\/pppppppp\/8\/8\/4P3\/8\/PPPP1PPP\/RNBQKBNR b KQkq e3 0 1","solution_fen":"rnbqkbnr\/pppp1ppp\/8\/4p3\/4P3\/8\/PPPP1PPP\/RNBQKBNR w KQkq e6 0 2"}
+[07-May-2025 22:21:14 Europe/Berlin] Raw position data for question 7: {"starting_fen":"rnbqkbnr\/pppp1ppp\/8\/4p3\/8\/5N2\/PPPPPPPP\/RNBQKB1R w KQkq - 0 1","solution_fen":"rnbqkbnr\/pppp1ppp\/8\/4N3\/8\/8\/PPPPPPPP\/RNBQKB1R b KQkq - 0 1"}
+[07-May-2025 22:21:14 Europe/Berlin] Raw position data for question 8: {"starting_fen":"2rqkbnr/pp2pppp/n7/7b/8/2N5/P1P2PPP/R1BQKBNR w KQkq - 0 1","solution_fen":"2rqkbnr/pp2pppp/n7/8/8/2N5/P1P2PPP/R1BbKBNR w KQkq - 0 1"}
+[07-May-2025 22:21:14 Europe/Berlin] Returning 3 questions for bank 5

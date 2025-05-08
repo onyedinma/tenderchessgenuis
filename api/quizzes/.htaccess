@@ -1,0 +1,25 @@
+# Allow access to PHP files in the quizzes directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Handle OPTIONS requests immediately
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+    
+    # Allow direct access to PHP files
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^(.*)$ $1 [QSA,L]
+</IfModule>
+
+# Enable error reporting
+php_flag display_errors on
+php_value error_reporting E_ALL
+
+# Allow CORS for development
+<IfModule mod_headers.c>
+    # Handle CORS for all request types
+    Header always set Access-Control-Allow-Origin "http://localhost:3000"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+    Header always set Access-Control-Allow-Credentials "true"
+</IfModule> 

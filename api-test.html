@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            margin-top: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chess Quiz API Test</h1>
+    
+    <div>
+        <h2>Authentication Tests</h2>
+        <button id="checkSession">Check Session</button>
+        <button id="studentLogin">Test Student Login</button>
+        <button id="studentLogout">Test Student Logout</button>
+    </div>
+    
+    <div>
+        <h2>Quiz API Tests</h2>
+        <button id="testQuizzes">Test Regular Quizzes Endpoint</button>
+        <button id="testQuizzesTest">Test Simplified Quizzes Endpoint</button>
+    </div>
+    
+    <div id="results">
+        <h2>Results</h2>
+        <div id="output">
+            <p>Click a button to test an API endpoint.</p>
+        </div>
+    </div>
+
+    <script>
+        // Test credentials
+        const testCredentials = {
+            username: 'testuser',
+            password: 'password123'
+        };
+
+        // Element references
+        const outputElement = document.getElementById('output');
+
+        // Helper function to display results
+        function showResult(title, data, isError = false) {
+            let html = `<h3>${title}</h3>`;
+            
+            if (isError) {
+                html += `<p class="error">Error: ${data}</p>`;
+            } else {
+                if (typeof data === 'object') {
+                    html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    html += `<p class="success">${data}</p>`;
+                }
+            }
+            
+            outputElement.innerHTML = html;
+        }
+
+        // Helper function to make API requests
+        async function fetchAPI(url, options = {}) {
+            try {
+                // Default options
+                const defaultOptions = {
+                    credentials: 'include', // Include cookies
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                // Merge options
+                const fetchOptions = {...defaultOptions, ...options};
+                
+                // Show what we're doing
+                showResult('Request In Progress', `Fetching ${url}...`);
+                
+                // Make the request
+                const response = await fetch(url, fetchOptions);
+                
+                // Get status and try to parse JSON
+                let responseData;
+                try {
+                    responseData = await response.json();
+                } catch (e) {
+                    responseData = 'Invalid JSON response';
+                }
+                
+                // Display results
+                showResult(
+                    `Response (Status: ${response.status})`, 
+                    responseData,
+                    !response.ok
+                );
+                
+                return responseData;
+            } catch (error) {
+                showResult('Fetch Error', error.message, true);
+                return null;
+            }
+        }
+
+        // Check session
+        document.getElementById('checkSession').addEventListener('click', () => {
+            fetchAPI('/api/auth/check-session.php');
+        });
+
+        // Student login
+        document.getElementById('studentLogin').addEventListener('click', async () => {
+            fetchAPI('/api/auth/student-login.php', {
+                method: 'POST',
+                body: JSON.stringify(testCredentials)
+            });
+        });
+
+        // Student logout
+        document.getElementById('studentLogout').addEventListener('click', () => {
+            fetchAPI('/api/auth/logout.php');
+        });
+
+        // Test quizzes endpoint
+        document.getElementById('testQuizzes').addEventListener('click', () => {
+            fetchAPI('/api/quizzes/get-quizzes.php');
+        });
+
+        // Test simplified quizzes endpoint
+        document.getElementById('testQuizzesTest').addEventListener('click', () => {
+            fetchAPI('/api/quizzes/get-quizzes-test.php');
+        });
+    </script>
+</body>
+</html> 

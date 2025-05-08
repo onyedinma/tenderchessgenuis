@@ -1,0 +1,120 @@
+[2025-05-05 06:17:43] Request received
+[2025-05-05 06:17:43] Raw input: {"name":"RTYu","section_type":"1"}
+[2025-05-05 06:17:43] Decoded data: Array
+(
+    [name] => RTYu
+    [section_type] => 1
+)
+
+[2025-05-05 06:17:43] Name: RTYu, Section Type: 1
+[2025-05-05 06:17:43] Using PDO connection from config.php
+[2025-05-05 06:17:43] is_active column exists: Yes
+[2025-05-05 06:17:43] Current bank count for section 1: 0
+[2025-05-05 06:17:43] SQL: INSERT INTO question_banks (name, section_type, is_active) VALUES (:name, :section_type, 0)
+[2025-05-05 06:17:43] Params: RTYu, 1
+[2025-05-05 06:17:43] Execute result: true
+[2025-05-05 06:17:43] New bank ID: 1
+[2025-05-05 06:17:43] Verified bank exists: Array
+(
+    [id] => 1
+    [name] => RTYu
+    [section_type] => 1
+)
+
+[2025-05-05 06:17:43] Response: {"success":true,"message":"Question bank created successfully","bank":{"id":1,"name":"RTYu","section_type":"1","question_count":0}}
+[2025-05-05 06:22:30] Request received
+[2025-05-05 06:22:30] Raw input: {"name":"TR","section_type":"1"}
+[2025-05-05 06:22:30] Decoded data: Array
+(
+    [name] => TR
+    [section_type] => 1
+)
+
+[2025-05-05 06:22:30] Name: TR, Section Type: 1
+[2025-05-05 06:22:30] Using PDO connection from config.php
+[2025-05-05 06:22:30] is_active column exists: Yes
+[2025-05-05 06:22:30] Current bank count for section 1: 0
+[2025-05-05 06:22:30] SQL: INSERT INTO question_banks (name, section_type, is_active) VALUES (:name, :section_type, 0)
+[2025-05-05 06:22:30] Params: TR, 1
+[2025-05-05 06:22:30] Execute result: true
+[2025-05-05 06:22:30] New bank ID: 2
+[2025-05-05 06:22:30] Verified bank exists: Array
+(
+    [id] => 2
+    [name] => TR
+    [section_type] => 1
+)
+
+[2025-05-05 06:22:30] Response: {"success":true,"message":"Question bank created successfully","bank":{"id":2,"name":"TR","section_type":"1","question_count":0}}
+[2025-05-05 07:23:53] Request received
+[2025-05-05 07:23:53] Raw input: {"name":"Tactics","section_type":"1"}
+[2025-05-05 07:23:53] Decoded data: Array
+(
+    [name] => Tactics
+    [section_type] => 1
+)
+
+[2025-05-05 07:23:53] Name: Tactics, Section Type: 1
+[2025-05-05 07:23:53] Using PDO connection from config.php
+[2025-05-05 07:23:53] is_active column exists: Yes
+[2025-05-05 07:23:53] Current bank count for section 1: 0
+[2025-05-05 07:23:53] SQL: INSERT INTO question_banks (name, section_type, is_active) VALUES (:name, :section_type, 0)
+[2025-05-05 07:23:53] Params: Tactics, 1
+[2025-05-05 07:23:53] Execute result: true
+[2025-05-05 07:23:53] New bank ID: 3
+[2025-05-05 07:23:53] Verified bank exists: Array
+(
+    [id] => 3
+    [name] => Tactics
+    [section_type] => 1
+)
+
+[2025-05-05 07:23:53] Response: {"success":true,"message":"Question bank created successfully","bank":{"id":3,"name":"Tactics","section_type":"1","question_count":0}}
+[2025-05-05 07:36:20] Request received
+[2025-05-05 07:36:20] Raw input: {"name":"STQ","section_type":"1"}
+[2025-05-05 07:36:20] Decoded data: Array
+(
+    [name] => STQ
+    [section_type] => 1
+)
+
+[2025-05-05 07:36:20] Name: STQ, Section Type: 1
+[2025-05-05 07:36:20] Using PDO connection from config.php
+[2025-05-05 07:36:20] is_active column exists: Yes
+[2025-05-05 07:36:20] Current bank count for section 1: 0
+[2025-05-05 07:36:20] SQL: INSERT INTO question_banks (name, section_type, is_active) VALUES (:name, :section_type, 0)
+[2025-05-05 07:36:20] Params: STQ, 1
+[2025-05-05 07:36:20] Execute result: true
+[2025-05-05 07:36:20] New bank ID: 4
+[2025-05-05 07:36:20] Verified bank exists: Array
+(
+    [id] => 4
+    [name] => STQ
+    [section_type] => 1
+)
+
+[2025-05-05 07:36:20] Response: {"success":true,"message":"Question bank created successfully","bank":{"id":4,"name":"STQ","section_type":"1","question_count":0}}
+[2025-05-05 07:36:49] Request received
+[2025-05-05 07:36:49] Raw input: {"name":"POS","section_type":"1"}
+[2025-05-05 07:36:49] Decoded data: Array
+(
+    [name] => POS
+    [section_type] => 1
+)
+
+[2025-05-05 07:36:49] Name: POS, Section Type: 1
+[2025-05-05 07:36:49] Using PDO connection from config.php
+[2025-05-05 07:36:49] is_active column exists: Yes
+[2025-05-05 07:36:49] Current bank count for section 1: 1
+[2025-05-05 07:36:49] SQL: INSERT INTO question_banks (name, section_type, is_active) VALUES (:name, :section_type, 0)
+[2025-05-05 07:36:49] Params: POS, 1
+[2025-05-05 07:36:49] Execute result: true
+[2025-05-05 07:36:49] New bank ID: 5
+[2025-05-05 07:36:49] Verified bank exists: Array
+(
+    [id] => 5
+    [name] => POS
+    [section_type] => 1
+)
+
+[2025-05-05 07:36:49] Response: {"success":true,"message":"Question bank created successfully","bank":{"id":5,"name":"POS","section_type":"1","question_count":0}}

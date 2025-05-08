@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Board Debug Tool</title>
+    <link rel="stylesheet" href="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .board-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .board-container {
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            border: 2px solid #eaeaea;
+            border-radius: 4px;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            height: 100px;
+            font-family: monospace;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #ffeaea;
+            border-radius: 4px;
+            border-left: 3px solid #e74c3c;
+        }
+        .success {
+            color: #27ae60;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #eaffea;
+            border-radius: 4px;
+            border-left: 3px solid #27ae60;
+        }
+        .info {
+            color: #2980b9;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            border-left: 3px solid #2980b9;
+        }
+        .fen-display {
+            font-family: monospace;
+            word-break: break-all;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .test-positions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .test-position-button {
+            background-color: #3498db;
+        }
+        .test-position-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chess Board Debug Tool</h1>
+    <p>Use this tool to test and debug chess position visualization issues.</p>
+    
+    <div class="controls">
+        <h3>Test with standard FEN positions</h3>
+        <div class="test-positions">
+            <button class="test-position-button" data-fen="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1">Starting Position</button>
+            <button class="test-position-button" data-fen="rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1">After e4</button>
+            <button class="test-position-button" data-fen="rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2">After e4 e5</button>
+            <button class="test-position-button" data-fen="rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2">After e4 e5 Nf3</button>
+            <button class="test-position-button" data-fen="rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2">After e4 e5 Nf3</button>
+            <button class="test-position-button" data-fen="rnbqkbnr/pppp1ppp/8/4N3/4P3/8/PPPP1PPP/RNBQKB1R b KQkq - 0 1">Knight captures on e5</button>
+        </div>
+        
+        <h3>Enter custom FEN notation:</h3>
+        <textarea id="fenInput" placeholder="Enter FEN notation">rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</textarea>
+        <button id="updateButton">Update Board</button>
+        <button id="validateButton">Validate FEN</button>
+        <div id="errorMessage" class="error" style="display: none;"></div>
+        <div id="successMessage" class="success" style="display: none;"></div>
+    </div>
+    
+    <div class="container">
+        <div class="board-section">
+            <h2>Chessboard.js Rendering</h2>
+            <div id="board1" class="board-container"></div>
+            <div class="info">
+                <p>Implementation: Using the chessboard.js library</p>
+                <div id="fenDisplay1" class="fen-display"></div>
+            </div>
+        </div>
+        
+        <div class="board-section">
+            <h2>Chess.js Validation</h2>
+            <div id="validationResult" class="info">
+                <p>Enter a FEN string and click "Validate FEN" to check if it's valid.</p>
+            </div>
+            <div id="validationDetails" class="fen-display" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <div class="board-section">
+        <h2>FEN Decomposition</h2>
+        <div id="fenBreakdown" class="fen-display">
+            <p>Enter a FEN string above to see its components.</p>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script>
+        // Initialize the boards
+        let board1 = ChessBoard('board1', {
+            position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+            showNotation: true
+        });
+        
+        // Update FEN display
+        function updateFenDisplay() {
+            const fenNotation = document.getElementById('fenInput').value.trim();
+            document.getElementById('fenDisplay1').textContent = fenNotation;
+            
+            // Break down FEN into components
+            breakdownFen(fenNotation);
+        }
+        
+        // Handle the update button click
+        document.getElementById('updateButton').addEventListener('click', function() {
+            const fenNotation = document.getElementById('fenInput').value.trim();
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successMessage');
+            
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            
+            try {
+                // Update the boards
+                board1.position(fenNotation);
+                updateFenDisplay();
+                
+                successElement.textContent = 'Board updated successfully';
+                successElement.style.display = 'block';
+            } catch (error) {
+                console.error('Error updating board:', error);
+                errorElement.textContent = 'Error updating board: ' + error.message;
+                errorElement.style.display = 'block';
+            }
+        });
+        
+        // Handle the validate button click
+        document.getElementById('validateButton').addEventListener('click', function() {
+            const fenNotation = document.getElementById('fenInput').value.trim();
+            const validationResult = document.getElementById('validationResult');
+            const validationDetails = document.getElementById('validationDetails');
+            
+            try {
+                // Try to validate the FEN
+                const chess = new Chess();
+                const isValid = chess.load(fenNotation);
+                
+                if (isValid) {
+                    validationResult.className = 'success';
+                    validationResult.innerHTML = '<p>✓ Valid FEN notation</p>';
+                    
+                    // Display additional validation info
+                    validationDetails.style.display = 'block';
+                    validationDetails.innerHTML = `
+                        <h3>Position Details:</h3>
+                        <p>Turn: ${chess.turn() === 'w' ? 'White' : 'Black'}</p>
+                        <p>In check: ${chess.in_check() ? 'Yes' : 'No'}</p>
+                        <p>In checkmate: ${chess.in_checkmate() ? 'Yes' : 'No'}</p>
+                        <p>In stalemate: ${chess.in_stalemate() ? 'Yes' : 'No'}</p>
+                        <p>Legal moves: ${chess.moves().length}</p>
+                    `;
+                } else {
+                    validationResult.className = 'error';
+                    validationResult.innerHTML = '<p>✗ Invalid FEN notation</p>';
+                    validationDetails.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error validating FEN:', error);
+                validationResult.className = 'error';
+                validationResult.innerHTML = '<p>✗ Error validating FEN: ' + error.message + '</p>';
+                validationDetails.style.display = 'none';
+            }
+        });
+        
+        // Break down FEN into components
+        function breakdownFen(fen) {
+            const fenBreakdown = document.getElementById('fenBreakdown');
+            
+            try {
+                const fenParts = fen.split(' ');
+                let html = '<h3>FEN Components:</h3>';
+                
+                if (fenParts.length >= 1) {
+                    html += `<p><strong>Board Position:</strong> ${fenParts[0]}</p>`;
+                }
+                
+                if (fenParts.length >= 2) {
+                    html += `<p><strong>Active Color:</strong> ${fenParts[1] === 'w' ? 'White' : 'Black'}</p>`;
+                }
+                
+                if (fenParts.length >= 3) {
+                    html += `<p><strong>Castling Availability:</strong> ${fenParts[2] || '-'}</p>`;
+                }
+                
+                if (fenParts.length >= 4) {
+                    html += `<p><strong>En Passant Target Square:</strong> ${fenParts[3]}</p>`;
+                }
+                
+                if (fenParts.length >= 5) {
+                    html += `<p><strong>Halfmove Clock:</strong> ${fenParts[4]}</p>`;
+                }
+                
+                if (fenParts.length >= 6) {
+                    html += `<p><strong>Fullmove Number:</strong> ${fenParts[5]}</p>`;
+                }
+                
+                fenBreakdown.innerHTML = html;
+            } catch (error) {
+                fenBreakdown.innerHTML = '<p class="error">Error breaking down FEN: ' + error.message + '</p>';
+            }
+        }
+        
+        // Handle test position buttons
+        document.querySelectorAll('.test-position-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const fen = this.getAttribute('data-fen');
+                document.getElementById('fenInput').value = fen;
+                document.getElementById('updateButton').click();
+                document.getElementById('validateButton').click();
+            });
+        });
+        
+        // Update displays on initial load
+        updateFenDisplay();
+    </script>
+</body>
+</html> 

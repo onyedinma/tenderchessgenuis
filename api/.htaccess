@@ -1,0 +1,40 @@
+# API .htaccess file
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Set the base directory
+    RewriteBase /api/
+    
+    # Handle OPTIONS requests immediately
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule .* - [R=200,L]
+    
+    # Rewrite requests without .php to include .php extension
+    # But only if the PHP file exists
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME}.php -f
+    RewriteRule ^(.+)$ $1.php [L,QSA]
+    
+    # Special rules for auth and quizzes directories
+    RewriteRule ^auth/([^/]+)$ auth/$1.php [L,QSA]
+    RewriteRule ^quizzes/([^/]+)$ quizzes/$1.php [L,QSA]
+    
+    # Default API endpoint
+    RewriteRule ^$ index.php [L]
+</IfModule>
+
+# Set CORS headers for OPTIONS requests
+<IfModule mod_headers.c>
+    # Handle OPTIONS requests
+    <If "%{REQUEST_METHOD} == 'OPTIONS'">
+        Header always set Access-Control-Allow-Origin "http://localhost:3000"
+        Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+        Header always set Access-Control-Allow-Credentials "true"
+    </If>
+</IfModule>
+
+# Enable error reporting
+php_flag display_errors on
+php_value error_reporting E_ALL 
