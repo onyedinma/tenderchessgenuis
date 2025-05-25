@@ -24,7 +24,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ element }) => {
   }
 
   // Verify the user has admin role
-  if (!isAdmin()) {
+  if (!isAdmin) {
     return (
       <Box m={5}>
         <Alert status="error" variant="solid" borderRadius="md">

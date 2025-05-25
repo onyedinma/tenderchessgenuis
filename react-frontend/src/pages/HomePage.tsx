@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     if (!isLoading && user) {
       // If user is already logged in, redirect to appropriate page
-      if (isAdmin()) {
+      if (isAdmin) {
         console.log('Admin user already logged in, redirecting to admin dashboard');
         navigate('/admin');
       } else {

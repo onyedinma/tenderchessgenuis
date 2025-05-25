@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, login as apiLogin, register as apiRegister, logout as apiLogout, checkSession } from '../services/api';
+import { checkSession, login as apiLogin, logout as apiLogout } from '../services/api';
 
 // Define user type
 export interface User {
@@ -9,186 +9,146 @@ export interface User {
   email: string;
   roles: string[];
   isAdmin: boolean;
-  groups?: Array<{ id: number; name: string }>;
+  isStudent?: boolean;
 }
 
 // Define context type
 interface AuthContextType {
   user: User | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
-  isAdmin: () => boolean;
+  logout: () => Promise<void>;
+  error: string | null;
+  isAdmin: boolean;
 }
 
 // Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Create provider component
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Check if user is logged in on initial load
-  useEffect(() => {
-    const performSessionCheck = async () => {
-      try {
-        setIsLoading(true);
-        console.log('Starting session check...');
-        const response = await checkSession();
-        
-        console.log('Session check response:', response);
-        
-        // Handle case where response is undefined
-        if (!response) {
-          console.error('No response received from session check');
-          setUser(null);
-          return;
-        }
-        
-        // Handle case where response.data is undefined
-        if (!response.data) {
-          console.error('No data in session check response');
-          setUser(null);
-          return;
-        }
-        
-        // Handle case where response.data.data is undefined
-        if (!response.data.data) {
-          console.error('No nested data in session check response');
-          setUser(null);
-          return;
-        }
-        
-        const { loggedIn, user: userData } = response.data.data;
-        
-        if (loggedIn === true && userData) {
-          console.log('User is logged in:', userData);
-          setUser({
-            id: userData.id,
-            name: userData.name,
-            email: userData.email,
-            roles: userData.roles || [],
-            isAdmin: userData.isAdmin === true
-          });
-        } else {
-          console.log('User is not logged in');
-          setUser(null);
-        }
-      } catch (err: any) {
-        console.error('Session check error:', err);
-        console.error('Error details:', {
-          message: err.message,
-          response: err.response?.data,
-          status: err.response?.status
-        });
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const checkAuthStatus = async () => {
+    try {
+      console.log('Starting session check...');
+      const response = await checkSession();
+      console.log('Session check response:', response);
 
-    performSessionCheck();
+      if (response.data.data.loggedIn) {
+        const userData = response.data.data.user;
+        // Check if this is a student session
+        const isStudent = response.data.data.userRoles?.includes('student') || false;
+        setUser({
+          ...userData,
+          isStudent
+        });
+        setIsLoading(false);
+      } else {
+        console.log('User is not logged in');
+        setUser(null);
+        setIsLoading(false);
+        
+        // Check for student session in localStorage
+        const storedStudentId = localStorage.getItem('storedStudentId');
+        const storedLoginTime = localStorage.getItem('storedLoginTime');
+        
+        if (storedStudentId && storedLoginTime) {
+          const loginTime = parseInt(storedLoginTime);
+          const currentTime = Date.now();
+          const sessionAge = currentTime - loginTime;
+          
+          // If session is less than 24 hours old
+          if (sessionAge < 24 * 60 * 60 * 1000) {
+            // Don't redirect if already on student pages
+            if (!window.location.pathname.includes('/student')) {
+              navigate('/student/login');
+            }
+            return;
+          }
+        }
+        
+        // Redirect to login if not on login page
+        if (!window.location.pathname.includes('/login')) {
+          navigate('/login');
+        }
+      }
+    } catch (err) {
+      console.error('Session check error:', err);
+      setError('Failed to check authentication status');
+      setUser(null);
+      setIsLoading(false);
+      
+      // Check for student session in localStorage
+      const storedStudentId = localStorage.getItem('storedStudentId');
+      if (storedStudentId && !window.location.pathname.includes('/student')) {
+        navigate('/student/login');
+      } else {
+        navigate('/login');
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkAuthStatus();
   }, []);
 
-  // Login function with improved error handling
   const login = async (email: string, password: string) => {
     try {
-      setIsLoading(true);
       setError(null);
       const response = await apiLogin(email, password);
       
-      if (response.data && response.data.success) {
-        const userData = response.data.user;
-        setUser(userData);
-        
-        if (userData.isAdmin) {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+      if (response.data.success) {
+        await checkAuthStatus(); // Refresh user data
+        navigate('/dashboard');
       } else {
-        throw new Error(response.data.message || 'Login failed');
+        setError(response.data.message || 'Login failed');
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'An error occurred during login';
-      console.error('Login error:', err);
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      setError(err.response?.data?.message || 'Login failed');
+      throw err;
     }
   };
 
-  // Register function with improved error handling
-  const register = async (name: string, email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await apiRegister(name, email, password);
-      
-      if (response.data && response.data.success) {
-        navigate('/login');
-      } else {
-        throw new Error(response.data.message || 'Registration failed');
-      }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'An error occurred during registration';
-      console.error('Registration error:', err);
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Logout function with improved error handling
   const logout = async () => {
     try {
       await apiLogout();
       setUser(null);
-      setError(null);
+      // Clear student session data
+      localStorage.removeItem('storedStudentId');
+      localStorage.removeItem('storedLoginTime');
       navigate('/login');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Logout error:', err);
-      setError('Failed to logout properly. Please try again.');
+      setError('Failed to logout');
     }
   };
 
-  const isAdmin = () => {
-    return user?.isAdmin === true;
-  };
-
-  // Context value
-  const value = {
-    user,
-    isLoading,
-    error,
-    login,
-    register,
-    logout,
-    isAdmin,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: !!user,
+      isLoading,
+      login,
+      logout,
+      error,
+      isAdmin: user?.isAdmin || false
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 // Create custom hook to use auth context
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  
   return context;
 };
 

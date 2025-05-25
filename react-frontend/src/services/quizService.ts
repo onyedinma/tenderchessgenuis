@@ -1,4 +1,4 @@
-import api from './api';
+import { api } from './api';
 import { request } from './api';
 
 // Types
@@ -27,32 +27,25 @@ export interface Puzzle {
 }
 
 export interface QuizResult {
-  id: number;
-  quiz_id: number;
-  user_id: number;
-  score: number;
-  time_taken: number;
-  completed_at: string;
-  quiz_title: string;
-  total_points: number;
-  puzzles: {
-    id: number;
-    title: string;
-    user_answer: string;
-    solution: string;
-    is_correct: boolean;
-    points_earned: number;
-    max_points: number;
-  }[];
+  submissionId: number;
+  totalPoints: number;
+  accuracy: number;
+  correctAnswers: number;
+  totalQuestions: number;
 }
 
-export interface QuizSubmission {
+interface QuizAnswer {
+  questionId: number;
+  answer: string;
+  timeTaken: number;
+}
+
+interface QuizSubmission {
   quizId: number;
-  answers: Record<number, string>; // Map of puzzle ID to user's answer
-  timeTaken: number; // in seconds
+  answers: QuizAnswer[];
 }
 
-export interface SubmissionResponse {
+interface SubmissionResponse {
   success: boolean;
   message: string;
   submission?: {
@@ -123,6 +116,13 @@ export interface AdminQuiz {
   submission_count: number;
 }
 
+// Validate FEN notation
+const validateFen = (fen: string): boolean => {
+  // Basic FEN validation regex
+  const fenRegex = /^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+ [wb] [KQkq-]{1,4} [a-h][1-8] [0-9]+ [0-9]+$/;
+  return fenRegex.test(fen);
+};
+
 // Get all quizzes the user has access to
 export const getQuizzes = async (): Promise<Quiz[]> => {
   const response = await api.getQuizzes();
@@ -131,26 +131,42 @@ export const getQuizzes = async (): Promise<Quiz[]> => {
 
 // Get a specific quiz by ID
 export const getQuiz = async (quizId: number): Promise<Quiz> => {
-  const response = await api.getQuizById(quizId.toString());
-  return response.data.quiz;
+  try {
+    const response = await api.get(`/quizzes/get-quiz.php?id=${quizId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching quiz:', error);
+    throw new Error(error.response?.data?.error || 'Failed to fetch quiz');
+  }
 };
 
 // Get quiz results for a specific quiz
 export const getQuizResults = async (quizId: number): Promise<QuizResult> => {
-  const response = await api.getQuizResults(quizId.toString());
-  return response.data.result;
+  try {
+    const response = await api.get(`/quizzes/get-results.php?id=${quizId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching quiz results:', error);
+    throw new Error(error.response?.data?.error || 'Failed to fetch quiz results');
+  }
 };
 
 // Submit quiz answers
-export const submitQuiz = async (submission: QuizSubmission): Promise<SubmissionResponse> => {
-  const { quizId, answers, timeTaken } = submission;
-  const answersArray = Object.entries(answers).map(([puzzleId, answer]) => ({
-    puzzle_id: parseInt(puzzleId),
-    answer
-  }));
-  
-  const response = await api.submitQuiz(quizId, answersArray);
-  return response.data;
+export const submitQuiz = async (submission: QuizSubmission): Promise<QuizResult> => {
+  try {
+    // Validate answers before submission
+    submission.answers.forEach(answer => {
+      if (!validateFen(answer.answer)) {
+        throw new Error(`Invalid FEN notation in answer for question ${answer.questionId}`);
+      }
+    });
+
+    const response = await api.post('/quizzes/submit-quiz.php', submission);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error submitting quiz:', error);
+    throw new Error(error.response?.data?.error || 'Failed to submit quiz');
+  }
 };
 
 // Create a new quiz (admin only)
@@ -169,6 +185,73 @@ export const getAdminQuizzes = async (params: AdminQuizParams = {}): Promise<Adm
   return response.data;
 };
 
+// Get question bank details
+export const getQuestionBank = async (bankId: number) => {
+  try {
+    const response = await api.get(`/quizzes/get-questions-by-bank.php?bank_id=${bankId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching question bank:', error);
+    throw new Error(error.response?.data?.error || 'Failed to fetch question bank');
+  }
+};
+
+// Get questions by section type
+export const getQuestionsBySection = async (sectionType: string) => {
+  try {
+    const response = await api.get(`/quizzes/get-questions-by-section.php?section_type=${sectionType}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching section questions:', error);
+    throw new Error(error.response?.data?.error || 'Failed to fetch section questions');
+  }
+};
+
+// Update section settings
+export const updateSectionSettings = async (settings: {
+  section1_enabled: boolean;
+  section2_enabled: boolean;
+  section1_timer: number;
+  section2_timer: number;
+}) => {
+  try {
+    const response = await api.post('/quizzes/update-section-settings.php', settings);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error updating section settings:', error);
+    throw new Error(error.response?.data?.error || 'Failed to update section settings');
+  }
+};
+
+// Get student submissions
+export const getStudentSubmissions = async (bankId: number, options?: {
+  studentId?: number;
+  compare?: boolean;
+  includeAnswers?: boolean;
+}) => {
+  try {
+    let url = `/question-banks/get-student-submissions.php?bank_id=${bankId}`;
+    
+    if (options?.studentId) {
+      url += `&student_id=${options.studentId}`;
+    }
+    
+    if (options?.compare) {
+      url += '&compare=true';
+    }
+    
+    if (options?.includeAnswers) {
+      url += '&include_answers=true';
+    }
+    
+    const response = await api.get(url);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching student submissions:', error);
+    throw new Error(error.response?.data?.error || 'Failed to fetch student submissions');
+  }
+};
+
 export default {
   getQuizzes,
   getQuiz,
@@ -176,4 +259,8 @@ export default {
   submitQuiz,
   createQuiz,
   getAdminQuizzes,
+  getQuestionBank,
+  getQuestionsBySection,
+  updateSectionSettings,
+  getStudentSubmissions,
 }; 

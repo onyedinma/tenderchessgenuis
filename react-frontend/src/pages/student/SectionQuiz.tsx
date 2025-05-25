@@ -43,6 +43,7 @@ interface Question {
   is_highlighted: number;
   bank_name: string;
   section_type: string;
+  bank_id: number;
 }
 
 interface SectionInfo {
@@ -111,12 +112,11 @@ const SectionQuiz: React.FC = () => {
       const totalTime = sectionInfo && sectionInfo.time_limit ? sectionInfo.time_limit * 60 : 0;
       const timeTaken = totalTime - timeLeft;
 
+      // Get the bank ID from the first question (all questions in a section belong to the same bank)
+      const bankId = questions[0]?.bank_id || 10; // Default to 10 if not found
+
       // Send to backend using the submitQuizAnswers API function
-      // Note: The backend submit-answers.php currently expects bankId.
-      // We might need to update the backend to handle section_type submission later
-      // For now, we'll pass a placeholder or the sectionId itself, understanding
-      // the backend might need adjustments to record section-level submissions.
-      const response = await submitQuizAnswers(parseInt(sectionId || '0'), answersData, timeTaken);
+      const response = await submitQuizAnswers(bankId, answersData, timeTaken);
 
       if (response.data.success) {
         // Assuming the backend returns score information on success
@@ -151,7 +151,7 @@ const SectionQuiz: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [isSubmitting, quizCompleted, userAnswers, sectionId, sectionInfo, timeLeft, toast, onOpen]);
+  }, [isSubmitting, quizCompleted, userAnswers, sectionInfo, timeLeft, toast, onOpen, questions]);
 
   useEffect(() => {
     const fetchSectionQuestions = async () => {

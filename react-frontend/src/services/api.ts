@@ -19,9 +19,9 @@ export const api = axios.create({
 // Add request interceptor for logging and URL handling
 api.interceptors.request.use(
   (config) => {
-    // Add /api prefix to all requests
-    if (config.url && !config.url.startsWith('/api')) {
-      config.url = `/api${config.url}`;
+    // Remove the /api prefix addition since we're serving from api directory
+    if (config.url?.startsWith('/api/')) {
+      config.url = config.url.replace('/api/', '/');
     }
     console.log('API Request:', config.method?.toUpperCase(), config.url);
     console.log('Request Headers:', config.headers);
