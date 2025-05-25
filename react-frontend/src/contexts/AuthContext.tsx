@@ -103,8 +103,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiLogin(email, password);
       
       if (response.data.success) {
-        await checkAuthStatus(); // Refresh user data
-        navigate('/dashboard');
+        // Wait for checkAuthStatus to complete and get the updated user data
+        await checkAuthStatus();
+        
+        // Get the latest user data from the response
+        const isAdmin = response.data.user?.isAdmin || false;
+        
+        // Navigate based on user role
+        if (isAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setError(response.data.message || 'Login failed');
       }
