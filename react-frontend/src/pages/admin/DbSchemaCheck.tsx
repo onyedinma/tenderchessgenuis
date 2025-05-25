@@ -30,30 +30,39 @@ import {
   Td,
 } from '@chakra-ui/react';
 import { CheckCircleIcon, WarningIcon, InfoIcon, RepeatIcon } from '@chakra-ui/icons';
-import axios from 'axios';
+import { getQuizzes } from '../../services/api';
 
 const DbSchemaCheck: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
-  const [schemaData, setSchemaData] = useState<any>(null);
+  const [schemaInfo, setSchemaInfo] = useState<any>(null);
   const [updateResult, setUpdateResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
 
-  const checkSchema = async () => {
-    setLoading(true);
-    setError(null);
-    setUpdateResult(null);
-    
+  const fetchSchemaInfo = async () => {
     try {
-      const response = await axios.get('/api/question-banks/check-db-schema.php');
-      console.log('Schema check response:', response.data);
-      setSchemaData(response.data);
+      const response = await getQuizzes();
+      if (response.data && response.data.success) {
+        setSchemaInfo(response.data.schemaInfo);
+      } else {
+        toast({
+          title: 'Error',
+          description: response.data.message || 'Failed to fetch schema info',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     } catch (error) {
-      console.error('Error checking schema:', error);
-      setError('Failed to check database schema. Please ensure the API is accessible.');
-    } finally {
-      setLoading(false);
+      console.error('Error fetching schema info:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch schema info',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -63,13 +72,13 @@ const DbSchemaCheck: React.FC = () => {
     setUpdateResult(null);
     
     try {
-      const response = await axios.post('/api/question-banks/update-db-schema.php');
+      const response = await getQuizzes('/api/question-banks/update-db-schema.php');
       console.log('Schema update response:', response.data);
       setUpdateResult(response.data);
       
       // If update was successful, refresh schema info
       if (response.data.success) {
-        await checkSchema();
+        await fetchSchemaInfo();
         toast({
           title: 'Schema updated successfully',
           description: 'The database schema has been updated to include all required fields.',
@@ -94,7 +103,7 @@ const DbSchemaCheck: React.FC = () => {
   };
 
   useEffect(() => {
-    checkSchema();
+    fetchSchemaInfo();
   }, []);
 
   return (
@@ -116,7 +125,7 @@ const DbSchemaCheck: React.FC = () => {
         <HStack>
           <Button 
             colorScheme="blue" 
-            onClick={checkSchema} 
+            onClick={fetchSchemaInfo} 
             isLoading={loading}
             leftIcon={<RepeatIcon />}
           >
@@ -127,7 +136,7 @@ const DbSchemaCheck: React.FC = () => {
             colorScheme="green" 
             onClick={updateSchema} 
             isLoading={updateLoading}
-            isDisabled={!schemaData || schemaData.schema_complete}
+            isDisabled={!schemaInfo || schemaInfo.schema_complete}
           >
             Update Schema
           </Button>
@@ -146,11 +155,11 @@ const DbSchemaCheck: React.FC = () => {
             <Spinner size="xl" color="blue.500" />
             <Text mt={4} color="gray.600">Checking database schema...</Text>
           </Box>
-        ) : schemaData ? (
+        ) : schemaInfo ? (
           <Card variant="outline" borderRadius="md" shadow="md">
-            <CardHeader bg={schemaData.schema_complete ? "green.50" : "yellow.50"} p={4}>
-              <Heading size="md" color={schemaData.schema_complete ? "green.700" : "yellow.700"}>
-                {schemaData.schema_complete ? (
+            <CardHeader bg={schemaInfo.schema_complete ? "green.50" : "yellow.50"} p={4}>
+              <Heading size="md" color={schemaInfo.schema_complete ? "green.700" : "yellow.700"}>
+                {schemaInfo.schema_complete ? (
                   <HStack>
                     <CheckCircleIcon />
                     <Text>Schema is Complete</Text>
@@ -166,9 +175,9 @@ const DbSchemaCheck: React.FC = () => {
             
             <CardBody p={5}>
               <VStack align="stretch" spacing={4}>
-                <Text fontSize="lg">{schemaData.message}</Text>
+                <Text fontSize="lg">{schemaInfo.message}</Text>
                 
-                {!schemaData.schema_complete && (
+                {!schemaInfo.schema_complete && (
                   <>
                     <Alert status="warning" borderRadius="md">
                       <AlertIcon />
@@ -178,7 +187,7 @@ const DbSchemaCheck: React.FC = () => {
                           The following fields are missing from your questions table:
                         </AlertDescription>
                         <List mt={2} ml={6}>
-                          {schemaData.missing_fields.map((field: string) => (
+                          {schemaInfo.missing_fields.map((field: string) => (
                             <ListItem key={field}>
                               <ListIcon as={InfoIcon} color="yellow.500" />
                               <Code fontWeight="bold">{field}</Code>
@@ -199,7 +208,7 @@ const DbSchemaCheck: React.FC = () => {
                           </Tr>
                         </Thead>
                         <Tbody>
-                          {schemaData.current_columns.map((column: any) => (
+                          {schemaInfo.current_columns.map((column: any) => (
                             <Tr key={column.name}>
                               <Td fontWeight="medium">{column.name}</Td>
                               <Td>{column.type}</Td>
@@ -212,20 +221,20 @@ const DbSchemaCheck: React.FC = () => {
                   </>
                 )}
                 
-                {schemaData.schema_complete && schemaData.sample_data && (
+                {schemaInfo.schema_complete && schemaInfo.sample_data && (
                   <Box>
                     <Heading size="sm" mb={2}>Sample Data Check</Heading>
                     <List spacing={2}>
                       <ListItem>
                         <HStack>
                           <Text fontWeight="medium">Algebraic Notation:</Text>
-                          {schemaData.sample_data.has_algebraic_notation ? (
+                          {schemaInfo.sample_data.has_algebraic_notation ? (
                             <Badge colorScheme="green">Present</Badge>
                           ) : (
                             <Badge colorScheme="yellow">Missing</Badge>
                           )}
-                          {schemaData.sample_data.algebraic_notation_sample && (
-                            <Text>Example: {schemaData.sample_data.algebraic_notation_sample}</Text>
+                          {schemaInfo.sample_data.algebraic_notation_sample && (
+                            <Text>Example: {schemaInfo.sample_data.algebraic_notation_sample}</Text>
                           )}
                         </HStack>
                       </ListItem>
@@ -233,15 +242,15 @@ const DbSchemaCheck: React.FC = () => {
                       <ListItem>
                         <HStack>
                           <Text fontWeight="medium">Move Sequence:</Text>
-                          {schemaData.sample_data.has_move_sequence ? (
+                          {schemaInfo.sample_data.has_move_sequence ? (
                             <Badge colorScheme="green">Present</Badge>
                           ) : (
                             <Badge colorScheme="yellow">Missing</Badge>
                           )}
                         </HStack>
-                        {schemaData.sample_data.move_sequence_sample && (
+                        {schemaInfo.sample_data.move_sequence_sample && (
                           <Code p={2} mt={1} fontSize="xs" borderRadius="md" maxW="100%" overflowX="auto" display="block">
-                            {schemaData.sample_data.move_sequence_sample}
+                            {schemaInfo.sample_data.move_sequence_sample}
                           </Code>
                         )}
                       </ListItem>
@@ -252,7 +261,7 @@ const DbSchemaCheck: React.FC = () => {
             </CardBody>
             
             <CardFooter bg="gray.50" p={4} borderTopWidth="1px">
-              {schemaData.schema_complete ? (
+              {schemaInfo.schema_complete ? (
                 <Alert status="success" borderRadius="md">
                   <AlertIcon />
                   Your database schema is ready for chess move tracking! You can now create questions with algebraic notation and move sequences.

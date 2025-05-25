@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ChakraProvider, Box } from '@chakra-ui/react';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { ChakraProvider, Box, Heading } from '@chakra-ui/react';
 import { AuthProvider } from './contexts/AuthContext';
 
 // Import components
@@ -26,37 +26,41 @@ import TestPage from './pages/TestPage';
 // Import student pages
 import StudentLogin from './pages/student/Login';
 import StudentDashboard from './pages/student/Dashboard';
+import QuizPage from './pages/student/QuizPage';
+import SectionQuiz from './pages/student/SectionQuiz';
+import SubmissionComparison from './pages/student/SubmissionComparison';
+import StudentSubmissionWrapper from './pages/student/StudentSubmissionWrapper';
 
 // Import admin pages
 import Dashboard from './pages/admin/Dashboard';
 import StudentManagement from './pages/admin/StudentManagement';
-import Section1Management from './pages/admin/Section1Management';
-import Section2Management from './pages/admin/Section2Management';
 import CategorySystem from './pages/admin/CategorySystem';
 import ScoringSystem from './pages/admin/ScoringSystem';
 import Analytics from './pages/admin/Analytics';
 import ShowControls from './pages/admin/ShowControls';
 import QuestionBankManager from './pages/admin/QuestionBankManager';
+import HighlightedQuestions from './pages/admin/HighlightedQuestions';
 import DbSchemaCheck from './pages/admin/DbSchemaCheck';
 import DatabaseInfo from './pages/admin/DatabaseInfo';
 
 const App: React.FC = () => {
   return (
     <ChakraProvider>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <Box minH="100vh" bg="gray.50">
+            <Header />
             <Routes>
               {/* Admin routes with AdminLayout */}
               <Route path="/admin" element={<AdminRoute element={<AdminLayout />} />}>
                 <Route index element={<Dashboard />} />
                 <Route path="students" element={<StudentManagement />} />
-                <Route path="section1" element={<Section1Management />} />
-                <Route path="section2" element={<Section2Management />} />
                 <Route path="categories" element={<CategorySystem />} />
                 <Route path="scoring" element={<ScoringSystem />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="controls" element={<ShowControls />} />
+                <Route path="show-controls" element={<ShowControls />} />
+                <Route path="highlighted-questions" element={<HighlightedQuestions />} />
                 <Route path="question-banks" element={<QuestionBankManager />} />
                 <Route path="db-schema-check" element={<DbSchemaCheck />} />
                 <Route path="database-info" element={<DatabaseInfo />} />
@@ -65,112 +69,69 @@ const App: React.FC = () => {
               {/* Student routes */}
               <Route path="/student/login" element={<StudentLogin />} />
               <Route path="/student/dashboard" element={<StudentDashboard />} />
+              <Route path="/student/quiz/:bankId" element={<QuizPage />} />
+              <Route path="/student/section/:sectionId" element={<SectionQuiz />} />
+              <Route path="/student/submissions/:bankId" element={<StudentSubmissionWrapper />} />
+              <Route path="/student/test" element={<Box p={5}><Heading>Test Route</Heading></Box>} />
               
               {/* Public routes */}
               <Route path="/login" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <Login />
-                  </Box>
-                </>
+                <Box p={5}>
+                  <Login />
+                </Box>
               } />
               
               <Route path="/register" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <Register />
-                  </Box>
-                </>
+                <Box p={5}>
+                  <Register />
+                </Box>
               } />
               
-              {/* Simple test page that doesn't depend on API calls */}
-              <Route path="/test" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <TestPage />
-                  </Box>
-                </>
-              } />
-              
-              {/* Test route for API testing - accessible without auth */}
               <Route path="/api-test" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <ApiTest />
-                  </Box>
-                </>
+                <Box p={5}>
+                  <ApiTest />
+                </Box>
               } />
               
-              {/* Protected routes */}
-              <Route path="/" element={<HomePage />} />
-              
-              <Route path="/home" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <ProtectedRoute element={<Home />} />
-                  </Box>
-                </>
+              <Route path="/test-page" element={
+                <Box p={5}>
+                  <TestPage />
+                </Box>
               } />
               
-              <Route path="/quizzes" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <ProtectedRoute element={<QuizList />} />
-                  </Box>
-                </>
-              } />
-              
-              <Route path="/quizzes/:id" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <ProtectedRoute element={<QuizDetails />} />
-                  </Box>
-                </>
+              <Route path="/quiz/:id" element={
+                <Box p={5}>
+                  <QuizDetails />
+                </Box>
               } />
               
               <Route path="/take-quiz/:id" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <ProtectedRoute element={<TakeQuiz />} />
-                  </Box>
-                </>
+                <Box p={5}>
+                  <TakeQuiz />
+                </Box>
               } />
               
               <Route path="/quiz-results/:id" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <ProtectedRoute element={<QuizResults />} />
-                  </Box>
-                </>
+                <Box p={5}>
+                  <QuizResults />
+                </Box>
               } />
               
               <Route path="/profile" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <ProtectedRoute element={<Profile />} />
-                  </Box>
-                </>
+                <Box p={5}>
+                  <Profile />
+                </Box>
               } />
               
-              {/* 404 route */}
-              <Route path="*" element={
-                <>
-                  <Header />
-                  <Box p={5}>
-                    <NotFound />
-                  </Box>
-                </>
+              <Route path="/quizzes" element={
+                <Box p={5}>
+                  <QuizList />
+                </Box>
               } />
+              
+              <Route path="/" element={<HomePage />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Box>
         </AuthProvider>

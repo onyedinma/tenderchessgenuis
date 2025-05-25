@@ -7,3 +7,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <App />
   </React.StrictMode>
 ); 
+
+/* 
+Looking for index.tsx to understand how the React app is mounted 
+*/ 

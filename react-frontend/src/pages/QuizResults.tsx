@@ -23,7 +23,7 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import { FaCheck, FaTimes, FaTrophy, FaClock, FaChessKnight } from 'react-icons/fa';
-import api from '../services/api';
+import { api, getQuizResults } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
 interface QuizResult {
@@ -62,34 +62,26 @@ const QuizResults: React.FC = () => {
 
   useEffect(() => {
     const fetchResults = async () => {
-      if (!id) return;
-      
       try {
         setLoading(true);
-        
-        const response = await api.getQuizResults(id);
-        
-        if (response.data && response.data.success && response.data.results) {
+        const response = await getQuizResults(id as string);
+        if (response.data && response.data.success) {
           setResults(response.data.results);
         } else {
-          setError(response.data?.message || 'Failed to load quiz results.');
+          setError(response.data?.message || 'Failed to load quiz results');
         }
-      } catch (err: any) {
-        console.error('Error fetching results:', err);
-        setError(err.message || 'Failed to load quiz results.');
+      } catch (err) {
+        setError('An error occurred while fetching quiz results');
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (!user) {
-      setError('You must be logged in to view results.');
-      setLoading(false);
-      return;
+    if (id) {
+      fetchResults();
     }
-
-    fetchResults();
-  }, [id, user]);
+  }, [id]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);

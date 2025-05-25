@@ -25,7 +25,7 @@ import {
 } from '@chakra-ui/react';
 import { FaChessKnight, FaTrophy, FaClock, FaChessBoard } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import { api, getQuizzes } from '../services/api';
 
 interface Quiz {
   id: number;
@@ -60,7 +60,7 @@ const Home: React.FC = () => {
       try {
         setLoading(true);
         // Fetch quizzes
-        const quizzesResponse = await api.getQuizzes();
+        const quizzesResponse = await getQuizzes();
         if (quizzesResponse.data && quizzesResponse.data.success) {
           const now = new Date();
           

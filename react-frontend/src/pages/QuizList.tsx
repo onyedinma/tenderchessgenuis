@@ -21,7 +21,7 @@ import {
   TabPanel,
   useToast,
 } from '@chakra-ui/react';
-import api from '../services/api';
+import { api, getQuizzes } from '../services/api';
 
 interface Quiz {
   id: number;
@@ -48,7 +48,7 @@ const QuizList: React.FC = () => {
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
-      const response = await api.getQuizzes();
+      const response = await getQuizzes();
       if (response.data && response.data.success) {
         setQuizzes(response.data.quizzes);
       } else {

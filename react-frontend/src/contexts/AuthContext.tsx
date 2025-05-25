@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { api, login as apiLogin, register as apiRegister, logout as apiLogout, checkSession } from '../services/api';
 
 // Define user type
 export interface User {
@@ -39,78 +39,101 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check if user is logged in on initial load
   useEffect(() => {
-    const checkSession = async () => {
+    const performSessionCheck = async () => {
       try {
         setIsLoading(true);
-        const response = await api.checkSession();
+        console.log('Starting session check...');
+        const response = await checkSession();
         
-        console.log('Session check response:', response.data);
+        console.log('Session check response:', response);
         
-        // Handle check-session.php response format
-        if (response.data && response.data.loggedIn === true && response.data.user) {
-          // Set user data from the response
+        // Handle case where response is undefined
+        if (!response) {
+          console.error('No response received from session check');
+          setUser(null);
+          return;
+        }
+        
+        // Handle case where response.data is undefined
+        if (!response.data) {
+          console.error('No data in session check response');
+          setUser(null);
+          return;
+        }
+        
+        // Handle case where response.data.data is undefined
+        if (!response.data.data) {
+          console.error('No nested data in session check response');
+          setUser(null);
+          return;
+        }
+        
+        const { loggedIn, user: userData } = response.data.data;
+        
+        if (loggedIn === true && userData) {
+          console.log('User is logged in:', userData);
           setUser({
-            id: response.data.user.id,
-            name: response.data.user.name,
-            email: response.data.user.email,
-            roles: response.data.user.roles || [],
-            isAdmin: response.data.user.isAdmin === true
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            roles: userData.roles || [],
+            isAdmin: userData.isAdmin === true
           });
         } else {
-          // Not logged in or session expired
+          console.log('User is not logged in');
           setUser(null);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Session check error:', err);
+        console.error('Error details:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status
+        });
         setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkSession();
+    performSessionCheck();
   }, []);
 
-  // Login function
+  // Login function with improved error handling
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.login(email, password);
-      
-      console.log('Login response:', response.data);
+      const response = await apiLogin(email, password);
       
       if (response.data && response.data.success) {
         const userData = response.data.user;
         setUser(userData);
         
-        // Redirect based on user role
         if (userData.isAdmin) {
-          // Redirect admin users to the admin dashboard
-          console.log('Admin user detected, redirecting to admin dashboard');
           navigate('/admin');
         } else {
-          // Redirect regular users to home
           navigate('/');
         }
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'An error occurred during login';
       console.error('Login error:', err);
-      setError(err.response?.data?.message || err.message || 'An error occurred during login');
-      throw err;
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Register function
+  // Register function with improved error handling
   const register = async (name: string, email: string, password: string) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.register(name, email, password);
+      const response = await apiRegister(name, email, password);
       
       if (response.data && response.data.success) {
         navigate('/login');
@@ -118,21 +141,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(response.data.message || 'Registration failed');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'An error occurred during registration');
-      throw err;
+      const errorMessage = err.response?.data?.message || err.message || 'An error occurred during registration';
+      console.error('Registration error:', err);
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Logout function
+  // Logout function with improved error handling
   const logout = async () => {
     try {
-      await api.logout();
+      await apiLogout();
       setUser(null);
+      setError(null);
       navigate('/login');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Logout error:', err);
+      setError('Failed to logout properly. Please try again.');
     }
   };
 

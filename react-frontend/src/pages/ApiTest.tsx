@@ -15,7 +15,7 @@ import {
   FormLabel,
   HStack
 } from '@chakra-ui/react';
-import api from '../services/api';
+import { api, testApi, testCors, checkApiStatus } from '../services/api';
 
 const ApiTest: React.FC = () => {
   const [results, setResults] = useState<string>('');
@@ -25,50 +25,25 @@ const ApiTest: React.FC = () => {
   const toast = useToast();
 
   const testEndpoints = async () => {
-    setLoading(true);
-    setResults('');
-    let output = '';
-
     try {
-      // Test 1: Simple CORS test
-      output += "Testing CORS configuration...\n";
-      const corsResponse = await api.testCors();
-      output += `CORS Test: ${JSON.stringify(corsResponse.data, null, 2)}\n\n`;
-      
-      // Test 2: API status
-      output += "Testing API status...\n";
-      try {
-        const statusResponse = await api.checkApiStatus();
-        output += `API Status: ${JSON.stringify(statusResponse.data, null, 2)}\n\n`;
-      } catch (error: any) {
-        output += `API Status Error: ${error.message}\n\n`;
-      }
-      
-      // Test 3: Session check
-      output += "Testing session check...\n";
-      try {
-        const sessionResponse = await api.checkSession();
-        output += `Session Check: ${JSON.stringify(sessionResponse.data, null, 2)}\n\n`;
-      } catch (error: any) {
-        output += `Session Check Error: ${error.message}\n\n`;
-      }
-      
-      setResults(output);
-      toast({
-        title: 'Tests completed',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch (error: any) {
-      setResults(`Error during API tests: ${error.message}`);
-      toast({
-        title: 'Test failed',
-        description: error.message,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      setLoading(true);
+      setResults({});
+
+      // Test basic API endpoint
+      const apiResponse = await testApi();
+      setResults(prev => ({ ...prev, api: apiResponse.data }));
+
+      // Test CORS
+      const corsResponse = await testCors();
+      setResults(prev => ({ ...prev, cors: corsResponse.data }));
+
+      // Test API status
+      const statusResponse = await checkApiStatus();
+      setResults(prev => ({ ...prev, status: statusResponse.data }));
+
+    } catch (err) {
+      console.error('Error testing endpoints:', err);
+      setError('Failed to test endpoints');
     } finally {
       setLoading(false);
     }

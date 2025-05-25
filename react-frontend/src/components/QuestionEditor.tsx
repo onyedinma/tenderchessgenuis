@@ -103,6 +103,13 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({
   const [moveSequence, setMoveSequence] = useState<Array<any>>([]);
   const [showingMoveAnimation, setShowingMoveAnimation] = useState(false);
 
+  // Add console log to track bankId at initialization
+  useEffect(() => {
+    if (isOpen) {
+      console.log('QuestionEditor opened with bankId:', bankId, 'and sectionType:', sectionType);
+    }
+  }, [isOpen, bankId, sectionType]);
+
   // Handlers for position changes that prevent cross-contamination
   const handleStartingPositionChange = (newFen: string) => {
     if (newFen !== startingPosition) {
@@ -383,6 +390,9 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({
     try {
       setIsLoading(true);
 
+      // Debug log the bankId and sectionType we're using
+      console.log('Saving question with bankId:', bankId, 'sectionType:', sectionType);
+
       // Validate that positions are different
       if (startingPosition === solutionPosition) {
         toast({
@@ -446,8 +456,15 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({
         solution_fen: solutionPosition
       };
 
+      // Ensure bankId is properly typed as a number
+      const bankIdNumber = Number(bankId);
+      if (isNaN(bankIdNumber)) {
+        throw new Error(`Invalid bank ID: ${bankId}`);
+      }
+
       const questionData = {
-        bank_id: bankId,
+        bank_id: bankIdNumber, // Ensure the bankId is set as a number
+        section_type: sectionType,
         question_text: questionText,
         correct_answer: correctAnswer,
         position: JSON.stringify(positionData),
@@ -461,12 +478,25 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({
 
       // Log the data we're sending for debugging purposes
       console.log('Sending question data:', JSON.stringify(questionData, null, 2));
+      console.log('Bank ID type:', typeof bankIdNumber);
+      console.log('Bank ID value:', bankIdNumber);
+
+      // This fixed data section is now redundant as we set the bank_id correctly above
+      // but we'll keep it for backward compatibility during debugging
+      const fixedQuestionData = {
+        ...questionData,
+        bank_id: bankIdNumber // Ensure bank_id is explicitly set
+      };
+
+      console.log('Using fixed question data with explicit bank_id:', fixedQuestionData);
 
       const endpoint = questionToEdit
         ? '/api/question-banks/update-question.php'
-        : '/api/question-banks/add-question.php';
+        : '/api/question-banks/add-question-simple.php';  // Use simplified endpoint for debugging
 
-      const response = await axios.post(endpoint, questionData);
+      console.log('Sending data to endpoint:', endpoint);
+
+      const response = await axios.post(endpoint, fixedQuestionData);
       
       console.log('API response:', response.data);
 
@@ -999,8 +1029,9 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({
                           <Text fontWeight="semibold" color="gray.700">Initial Position</Text>
                           {startingPosition ? (
                             <ChessBoard 
-                              fen={startingPosition} 
-                              width={240} 
+                              position={startingPosition} 
+                              boardSize={240}
+                              allowMoves={false}
                             />
                           ) : (
                             <Text p={4} color="red.500">Invalid starting position</Text>
@@ -1034,8 +1065,9 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({
                           <Text fontWeight="semibold" color="gray.700">Solution Position</Text>
                           {solutionPosition ? (
                             <ChessBoard 
-                              fen={solutionPosition}
-                              width={240}
+                              position={solutionPosition}
+                              boardSize={240}
+                              allowMoves={false}
                             />
                           ) : (
                             <Text p={4} color="red.500">Invalid solution position</Text>

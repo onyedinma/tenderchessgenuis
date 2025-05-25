@@ -90,25 +90,27 @@ const StudentManagement: React.FC = () => {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/students/get-students.php');
-      if (response.data.success) {
+      const response = await axios.get('/students/get-all.php');
+      if (response.data && response.data.success) {
         setStudents(response.data.students);
       } else {
         toast({
-          title: 'Error fetching students',
-          description: response.data.message,
+          title: 'Error',
+          description: response.data.message || 'Failed to fetch students',
           status: 'error',
-          duration: 3000,
+          duration: 5000,
+          isClosable: true,
         });
       }
     } catch (error) {
+      console.error('Error fetching students:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch students',
         status: 'error',
-        duration: 3000,
+        duration: 5000,
+        isClosable: true,
       });
-      console.error('Error fetching students:', error);
     } finally {
       setLoading(false);
     }
@@ -169,31 +171,34 @@ const StudentManagement: React.FC = () => {
     if (!deleteId) return;
     
     try {
-      const response = await axios.post('/api/students/delete-student.php', { id: deleteId });
-      if (response.data.success) {
-        setStudents(students.filter(student => student.id !== deleteId));
+      const response = await axios.delete(`/students/delete.php?id=${deleteId}`);
+      if (response.data && response.data.success) {
         toast({
-          title: 'Student deleted',
-          description: 'The student has been successfully removed',
+          title: 'Success',
+          description: 'Student deleted successfully',
           status: 'success',
           duration: 3000,
+          isClosable: true,
         });
+        fetchStudents();
       } else {
         toast({
           title: 'Error',
-          description: response.data.message,
+          description: response.data.message || 'Failed to delete student',
           status: 'error',
-          duration: 3000,
+          duration: 5000,
+          isClosable: true,
         });
       }
     } catch (error) {
+      console.error('Error deleting student:', error);
       toast({
         title: 'Error',
         description: 'Failed to delete student',
         status: 'error',
-        duration: 3000,
+        duration: 5000,
+        isClosable: true,
       });
-      console.error('Error deleting student:', error);
     } finally {
       onAlertClose();
       setDeleteId(null);
@@ -236,22 +241,23 @@ const StudentManagement: React.FC = () => {
           password: formData.password || undefined, // Only send if password is being changed
         };
         
-        const response = await axios.post('/api/students/update-student.php', updateData);
+        const response = await axios.put(`/students/update.php?id=${editingStudent.id}`, updateData);
         
-        if (response.data.success) {
+        if (response.data && response.data.success) {
           // Update the students array with the updated student
           setStudents(students.map(s => 
             s.id === editingStudent.id ? response.data.student : s
           ));
           
           toast({
-            title: 'Student updated',
-            description: 'The student information has been updated',
+            title: 'Success',
+            description: 'Student updated successfully',
             status: 'success',
             duration: 3000,
+            isClosable: true,
           });
         } else {
-          throw new Error(response.data.message);
+          throw new Error(response.data.message || 'Failed to update student');
         }
       } else {
         // Add new student
@@ -263,20 +269,21 @@ const StudentManagement: React.FC = () => {
           photo: photoData,
         };
         
-        const response = await axios.post('/api/students/add-student.php', newStudentData);
+        const response = await axios.post('/students/create.php', newStudentData);
         
-        if (response.data.success) {
+        if (response.data && response.data.success) {
           // Add the new student to the list
           setStudents([...students, response.data.student]);
           
           toast({
-            title: 'Student added',
-            description: 'The new student has been added successfully',
+            title: 'Success',
+            description: 'Student created successfully',
             status: 'success',
             duration: 3000,
+            isClosable: true,
           });
         } else {
-          throw new Error(response.data.message);
+          throw new Error(response.data.message || 'Failed to create student');
         }
       }
       

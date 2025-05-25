@@ -15,7 +15,7 @@ import {
   AlertIcon,
   useToast,
 } from '@chakra-ui/react';
-import api from '../services/api';
+import { api, getQuizById } from '../services/api';
 
 interface Quiz {
   id: number;
@@ -40,7 +40,7 @@ const QuizDetails: React.FC = () => {
     const fetchQuizDetails = async () => {
       try {
         setLoading(true);
-        const response = await api.getQuizById(id as string);
+        const response = await getQuizById(id as string);
         if (response.data && response.data.success) {
           setQuiz(response.data.quiz);
         } else {

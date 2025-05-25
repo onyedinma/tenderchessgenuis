@@ -41,7 +41,7 @@ import {
   Tooltip,
 } from '@chakra-ui/react';
 import { RepeatIcon, InfoIcon } from '@chakra-ui/icons';
-import axios from 'axios';
+import { getQuizzes } from '../../services/api';
 
 interface ColumnInfo {
   Field: string;
@@ -92,7 +92,7 @@ const DatabaseInfo: React.FC = () => {
     setError(null);
     
     try {
-      const response = await axios.get('/api/question-banks/show-tables-info.php');
+      const response = await getQuizzes();
       console.log('Database info response:', response.data);
       setDbInfo(response.data);
       

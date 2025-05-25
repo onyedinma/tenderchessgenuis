@@ -14,7 +14,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import axios from 'axios';
+import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import AlreadyLoggedInModal from './AlreadyLoggedInModal';
 
@@ -35,10 +35,39 @@ const StudentLogin: React.FC<StudentLoginProps> = ({ onLoginSuccess }) => {
 
   const handleLogoutOtherSession = async () => {
     try {
-      await axios.post('/api/auth/logout.php', {}, { withCredentials: true });
+      setLoading(true);
+      
+      // Try to login with force_logout=true instead of calling logout.php
+      const response = await api.post('/auth/student-login.php', {
+        username,
+        password,
+        force_logout: true
+      });
+      
       setShowAlreadyLoggedInModal(false);
-      // Retry login after logout
-      handleSubmit(new Event('submit') as any);
+      
+      if (response.data.success) {
+        console.log("Session ID from login response:", response.data.session_id);
+        
+        localStorage.setItem('studentLoginTime', Date.now().toString());
+        localStorage.setItem('studentId', response.data.student.id.toString());
+        
+        toast({
+          title: 'Login successful',
+          description: `Welcome back, ${response.data.student.name}!`,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        
+        if (onLoginSuccess) {
+          onLoginSuccess(response.data.student);
+        } else {
+          navigate('/student/dashboard');
+        }
+      } else {
+        setError(response.data.message || 'Login failed');
+      }
     } catch (err) {
       console.error('Error logging out other session:', err);
       toast({
@@ -48,6 +77,8 @@ const StudentLogin: React.FC<StudentLoginProps> = ({ onLoginSuccess }) => {
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,11 +96,9 @@ const StudentLogin: React.FC<StudentLoginProps> = ({ onLoginSuccess }) => {
       
       console.log("Sending student login request with credentials", { username });
       
-      const response = await axios.post('/api/auth/student-login.php', {
+      const response = await api.post('/auth/student-login.php', {
         username,
         password
-      }, {
-        withCredentials: true
       });
       
       console.log("Student login response:", response.data);
@@ -94,9 +123,7 @@ const StudentLogin: React.FC<StudentLoginProps> = ({ onLoginSuccess }) => {
         });
         
         try {
-          const sessionCheck = await axios.get('/api/auth/check-session.php', {
-            withCredentials: true
-          });
+          const sessionCheck = await api.get('/auth/check-session.php');
           console.log("Session check after login:", sessionCheck.data);
           
           if (!sessionCheck.data.loggedIn) {
